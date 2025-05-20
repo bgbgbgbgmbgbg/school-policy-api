@@ -2,7 +2,7 @@ services:
   - type: web
     name: school-policy-api
     env: python
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: ""
     startCommand: "gunicorn app:app"
     plan: free
     region: oregon
