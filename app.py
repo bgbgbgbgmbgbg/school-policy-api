@@ -1,24 +1,41 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
+import requests
+import csv
+import io
 
 app = Flask(__name__)
 
-# 軽量化されたポリシーデータ（コード内に定義）
-POLICY_DATA = {
-    "policy": {
-        "SNS利用": {
-            "基本方針": "適切な使い方を指導する",
-            "対応例": [
-                {"ケース": "軽い言い争い", "対応": "話し合いを促す"},
-                {"ケース": "悪口投稿", "対応": "担任が指導し保護者に連絡"},
-                {"ケース": "脅迫行為", "対応": "管理職・警察と連携"}
-            ]
-        }
-    }
-}
+# ファイルIDとAPIキー（今回は共有設定で誰でも見れるのでAPIキー不要）
+JSON_FILE_ID = "1a4vJQpCzftfG3Ue1O3AUrA0b0pOdQVtt"
+CSV_FILE_ID = "1dgMm81RHbSjnZzkLz69uK1tudpw6zbyq"
+
+def get_drive_file_content(file_id):
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    else:
+        return None
 
 @app.route("/school-policy", methods=["GET"])
-def get_policy():
-    return jsonify(POLICY_DATA)
+def get_school_policy():
+    content = get_drive_file_content(JSON_FILE_ID)
+    if content:
+        try:
+            return jsonify(eval(content))  # 注意：JSONで構造化されていること前提
+        except Exception:
+            return jsonify({"error": "JSONデータの読み込みに失敗"}), 500
+    return jsonify({"error": "Google Driveから取得できませんでした"}), 500
+
+@app.route("/student-guidance", methods=["GET"])
+def get_student_guidance():
+    content = get_drive_file_content(CSV_FILE_ID)
+    if content:
+        # CSV文字列 → JSON形式に変換
+        csvfile = io.StringIO(content)
+        reader = csv.DictReader(csvfile)
+        return jsonify([row for row in reader])
+    return jsonify({"error": "CSVの取得に失敗"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
