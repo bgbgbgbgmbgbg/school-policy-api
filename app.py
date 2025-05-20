@@ -39,3 +39,10 @@ def get_student_guidance():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+from flask import send_from_directory
+import os
+
+@app.route("/openapi.yaml", methods=["GET"])
+def serve_openapi():
+    return send_from_directory(directory=os.path.dirname(__file__), path="openapi.yaml", mimetype="text/yaml")
