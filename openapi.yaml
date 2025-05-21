@@ -2,18 +2,20 @@ openapi: 3.0.0
 info:
   title: School Guidance API
   version: 1.0.0
+servers:
+  - url: https://school-policy-api.onrender.com
 paths:
   /school-policy:
     get:
       summary: 学校の指導方針を取得
       operationId: getSchoolPolicy
       responses:
-        '200':
+        "200":
           description: 指導方針のJSONを返す
   /student-guidance:
     get:
       summary: 生徒指導事例を取得
       operationId: getStudentGuidance
       responses:
-        '200':
+        "200":
           description: CSVをJSONに変換した内容を返す
