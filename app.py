@@ -46,3 +46,11 @@ import os
 @app.route("/openapi.yaml", methods=["GET"])
 def serve_openapi():
     return send_from_directory(directory=os.path.dirname(__file__), path="openapi.yaml", mimetype="text/yaml")
+
+@app.route("/")
+def root():
+    return "Service is running"
+
+@app.route("/ping")
+def ping():
+    return "pong"
